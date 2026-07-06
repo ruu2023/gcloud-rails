@@ -21,7 +21,13 @@ Things you may want to cover:
 
 * Deployment instructions
 
+
+
 ```bash
+chmod +x bin/docker-entrypoint
+git update-index --chmod=+x bin/docker-entrypoint
+
+# deploy
 gcloud run deploy gcloud-rails \
   --source . \
   --platform managed \
