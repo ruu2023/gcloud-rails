@@ -64,19 +64,19 @@ FROM base
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
 
-# == added ==
-RUN mkdir -p /rails/storage && chown -R rails:rails /rails/storage
-# == added ==
-USER 1000:1000
-
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
 # == added ==
+# 📂 【超重要】SQLiteやログが絶対に書き込めるようにディレクトリ権限をガチガチに設定する
+RUN mkdir -p /rails/storage /rails/log /rails/tmp && \
+    chown -R rails:rails /rails/storage /rails/log /rails/tmp && \
+    chmod -R 775 /rails/storage /rails/log /rails/tmp
+
+# ⚠️ Cloud Runで確実に初期設定を動かすため、エントリーポイントはrootのまま実行させる
+# (エントリーポイントスクリプトの中で、必要に応じてユーザーを切り替えるか、このまま実行します)
 USER root
-RUN chown -R rails:rails /rails/storage
-USER 1000:1000
 # == added ==
 
 # Entrypoint prepares the database.
