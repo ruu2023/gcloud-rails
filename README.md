@@ -21,4 +21,14 @@ Things you may want to cover:
 
 * Deployment instructions
 
+```bash
+gcloud run deploy gcloud-rails \
+  --source . \
+  --platform managed \
+  --region asia-northeast1 \
+  --allow-unauthenticated \
+  --port=80 \
+  --set-env-vars="RAILS_MASTER_KEY=[masterkey]"
+```
+
 * ...
