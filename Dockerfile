@@ -63,25 +63,15 @@ FROM base
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+USER 1000:1000
 
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
-
-# == added ==
-# 📂 【超重要】SQLiteやログが絶対に書き込めるようにディレクトリ権限をガチガチに設定する
-RUN mkdir -p /rails/storage /rails/log /rails/tmp && \
-    chown -R rails:rails /rails/storage /rails/log /rails/tmp && \
-    chmod -R 775 /rails/storage /rails/log /rails/tmp
-
-# ⚠️ Cloud Runで確実に初期設定を動かすため、エントリーポイントはrootのまま実行させる
-# (エントリーポイントスクリプトの中で、必要に応じてユーザーを切り替えるか、このまま実行します)
-USER root
-# == added ==
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+CMD ["./bin/rails", "server"]
